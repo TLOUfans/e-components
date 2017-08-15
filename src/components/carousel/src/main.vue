@@ -1,47 +1,65 @@
 <template>
-  <div
-    class="el-carousel"
-    :class="{ 'el-carousel--card': type === 'card' }"
-    @mouseenter.stop="handleMouseEnter"
-    @mouseleave.stop="handleMouseLeave">
+  <div>
     <div
-      class="el-carousel__container"
-      :style="{ height: height }">
-      <transition name="carousel-arrow-left">
-        <button
-          v-if="arrow !== 'never'"
-          v-show="arrow === 'always' || hover"
-          @mouseenter="handleButtonEnter('left')"
-          @mouseleave="handleButtonLeave"
-          @click.stop="throttledArrowClick(activeIndex - 1)"
-          class="el-carousel__arrow el-carousel__arrow--left">
-          <i class="el-icon-arrow-left"></i>
-        </button>
-      </transition>
-      <transition name="carousel-arrow-right">
-        <button
-          v-if="arrow !== 'never'"
-          v-show="arrow === 'always' || hover"
-          @mouseenter="handleButtonEnter('right')"
-          @mouseleave="handleButtonLeave"
-          @click.stop="throttledArrowClick(activeIndex + 1)"
-          class="el-carousel__arrow el-carousel__arrow--right">
-          <i class="el-icon-arrow-right"></i>
-        </button>
-      </transition>
-      <slot></slot>
+      class="el-carousel"
+      :class="{ 'el-carousel--card': type === 'card' }"
+      @mouseenter.stop="handleMouseEnter"
+      @mouseleave.stop="handleMouseLeave">
+      <div
+        class="el-carousel__container"
+        :style="{ height: height }">
+        <transition name="carousel-arrow-left">
+          <button
+            v-if="arrow !== 'never'"
+            v-show="arrow === 'always' || hover"
+            @mouseenter="handleButtonEnter('left')"
+            @mouseleave="handleButtonLeave"
+            @click.stop="throttledArrowClick(activeIndex - 1)"
+            class="el-carousel__arrow el-carousel__arrow--left">
+            <i class="el-icon-arrow-left"></i>
+          </button>
+        </transition>
+        <transition name="carousel-arrow-right">
+          <button
+            v-if="arrow !== 'never'"
+            v-show="arrow === 'always' || hover"
+            @mouseenter="handleButtonEnter('right')"
+            @mouseleave="handleButtonLeave"
+            @click.stop="throttledArrowClick(activeIndex + 1)"
+            class="el-carousel__arrow el-carousel__arrow--right">
+            <i class="el-icon-arrow-right"></i>
+          </button>
+        </transition>
+        <slot></slot>
+      </div>
+      <ul
+        class="el-carousel__indicators"
+        v-if="indicatorPosition !== 'none'"
+        :class="{ 'el-carousel__indicators--labels': hasLabel, 'el-carousel__indicators--outside': indicatorPosition === 'outside' || type === 'card' }">
+        <li
+          v-for="(item, index) in items"
+          class="el-carousel__indicator"
+          :class="{ 'is-active': index === activeIndex }"
+          @mouseenter="throttledIndicatorHover(index)"
+          @click.stop="handleIndicatorClick(index)">
+          <button class="el-carousel__button"><span v-if="hasLabel">{{ item.label }}</span></button>
+        </li>
+      </ul>
     </div>
-    <ul
-      class="el-carousel__indicators"
-      v-if="indicatorPosition !== 'none'"
-      :class="{ 'el-carousel__indicators--labels': hasLabel, 'el-carousel__indicators--outside': indicatorPosition === 'outside' || type === 'card' }">
-      <li
-        v-for="(item, index) in items"
-        class="el-carousel__indicator"
-        :class="{ 'is-active': index === activeIndex }"
-        @mouseenter="throttledIndicatorHover(index)"
-        @click.stop="handleIndicatorClick(index)">
-        <button class="el-carousel__button"><span v-if="hasLabel">{{ item.label }}</span></button>
+    <ul 
+      class="el-carousel-review" v-if="review" 
+      @mouseenter.stop="handleMouseEnter"
+      @mouseleave.stop="handleMouseLeave"
+      :style="{ width: $props.width }">
+      <li v-for="(item, index) in $children">
+        <div class="el-carousel-review-container">
+          <div 
+          class="el-carousel-review-border" 
+          :class="{ 'review-active': index === activeIndex }"
+          @click.stop="handleIndicatorClick(index)">
+            <img :src="item.$slots.default[0].data.attrs.src" alt="" :style="{ float: 'left', width: imgWidth }">
+          </div>
+        </div>
       </li>
     </ul>
   </div>
@@ -80,7 +98,12 @@ export default {
       type: String,
       default: 'hover'
     },
-    type: String
+    type: String,
+    review: false,
+    imgWidth: {
+      type: String,
+      default: '100px'
+    }
   },
   data() {
     return {
@@ -222,3 +245,46 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+  .el-carousel-review {
+    list-style: none;
+    margin: 3px 0 0 0;
+    padding: 0;
+    overflow-x: auto;
+    white-space:nowrap;
+  }
+  .el-carousel-review > li{
+    display: inline-block;
+    cursor: pointer;
+  }
+  .el-carousel-review-container {
+    
+  }
+  .el-carousel-review-container .el-carousel-review-border {
+    padding: 2px;
+    border: 2px solid #fff;
+    overflow: hidden;
+    transition: all 500ms;
+  }
+  .review-active {
+    border: 2px solid #FF4949 !important;
+    transition: all 500ms;
+  }
+
+  .el-carousel-review::-webkit-scrollbar {
+    background: transparent;
+    width: 12px;
+  }
+  .el-carousel-review:hover::-webkit-scrollbar {
+      background: #D3DCE6;
+  }
+  .el-carousel-review:hover::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+      border-radius: 10px;
+  }
+  .el-carousel-review:hover::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+  }
+</style>

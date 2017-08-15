@@ -1,9 +1,9 @@
 <template>
-  <div class="block">
+  <div class="block" id="CarouselContainer">
     <span class="demonstration">Click 指示器触发</span>
-    <el-carousel trigger="click" height="1080px">
+    <el-carousel trigger="click" height="270px" :review="true" :imgWidth="imgWidth">
       <el-carousel-item v-for="(item, index) in items" :key="index">
-        <img :src="item" alt=""/>
+        <img :src="item" alt="" width="480px"/>
       </el-carousel-item>
     </el-carousel>
   </div>
@@ -19,7 +19,8 @@ export default {
         'http://cn.bing.com/az/hprichbg/rb/Kitesurfing_ZH-CN11259743343_1920x1080.jpg',
         'http://cn.bing.com/az/hprichbg/rb/LoxodontaAfricana_ZH-CN10434704249_1920x1080.jpg',
         'http://cn.bing.com/az/hprichbg/rb/CavernduPontdArc_ZH-CN9994344414_1920x1080.jpg'
-      ]
+      ],
+      imgWidth: '100px'
     }
   }
 }
@@ -27,6 +28,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  #CarouselContainer {
+    width: 480px;
+  }
   .el-carousel__item h3 {
     color: #475669;
     font-size: 14px;
