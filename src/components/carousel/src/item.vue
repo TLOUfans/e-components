@@ -26,7 +26,7 @@
 <script>
   const CARD_SCALE = 0.83;
   export default {
-    name: 'ElCarouselItem',
+    name: 'NpmsCarouselItem',
     props: {
       name: String,
       label: {

@@ -50,16 +50,13 @@
       class="el-carousel-review" v-if="review" 
       @mouseenter.stop="handleMouseEnter"
       @mouseleave.stop="handleMouseLeave"
-      :style="{ width: $props.width }"
-      @mousedown.stop="handleMouseDown"
-      @mousemove.stop="handleMouseMove"
-      @mouseup.stop="handleMouseUp">
+      :style="{ width: $props.width }">
       <li v-for="(item, index) in $children">
         <div class="el-carousel-review-container">
           <div 
           class="el-carousel-review-border" 
           :class="{ 'review-active': index === activeIndex }"
-          @click.stop="handleIndicatorClick(index)">
+          @click.stop="handleIndicatorClick(index, $parent)">
             <img :src="item.$slots.default[0].data.attrs.src" alt="" :style="{ float: 'left', width: imgWidth }">
             <span class="describe" v-show="index === activeIndex">{{ item.$slots.default[0].data.attrs.des }}</span>
           </div>
@@ -74,7 +71,7 @@ import throttle from 'throttle-debounce/throttle';
 import { addResizeListener, removeResizeListener } from '@/utils/resize-event';
 
 export default {
-  name: 'ElCarousel',
+  name: 'NpmsCarousel',
   props: {
     initialIndex: {
       type: Number,
@@ -115,8 +112,7 @@ export default {
       activeIndex: -1,
       containerWidth: 0,
       timer: null,
-      hover: false,
-      isMouseDown: false
+      hover: false
     };
   },
   computed: {
@@ -169,7 +165,7 @@ export default {
       });
     },
     updateItems() {
-      this.items = this.$children.filter(child => child.$options.name === 'ElCarouselItem');
+      this.items = this.$children.filter(child => child.$options.name === 'NpmsCarouselItem');
     },
     resetItemPosition() {
       this.items.forEach((item, index) => {
@@ -218,26 +214,18 @@ export default {
     next() {
       this.setActiveItem(this.activeIndex + 1);
     },
-    handleIndicatorClick(index) {
+    handleIndicatorClick(index, parent) {
       this.activeIndex = index;
+      if(parent) {
+        if((index + 1) * parseInt(this.imgWidth) > parseInt(parent.width) / 2) {
+          console.log('移动');
+        }
+      }
     },
     handleIndicatorHover(index) {
       if (this.trigger === 'hover' && index !== this.activeIndex) {
         this.activeIndex = index;
       }
-    },
-    handleMouseDown() {
-      this.isMouseDown = true;
-      console.log(1);
-    },
-    handleMouseMove() {
-      if(this.isMouseDown) {
-        console.log(2);
-      }
-    },
-    handleMouseUp() {
-      this.isMouseDown = false;
-      console.log(3);
     }
   },
   created() {
@@ -269,13 +257,14 @@ export default {
     list-style: none;
     margin: 3px 0 0 0;
     padding: 0;
-    overflow-x: auto;
+    overflow-x: hidden;
     white-space:nowrap;
   }
   .el-carousel-review > li{
     display: inline-block;
     cursor: pointer;
     user-select: none;
+    position: relative;
   }
   .el-carousel-review-container {
     position: relative;
