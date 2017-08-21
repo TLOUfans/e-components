@@ -50,7 +50,10 @@
       class="el-carousel-review" v-if="review" 
       @mouseenter.stop="handleMouseEnter"
       @mouseleave.stop="handleMouseLeave"
-      :style="{ width: $props.width }">
+      :style="{ width: $props.width }"
+      @mousedown.stop="handleMouseDown"
+      @mousemove.stop="handleMouseMove"
+      @mouseup.stop="handleMouseUp">
       <li v-for="(item, index) in $children">
         <div class="el-carousel-review-container">
           <div 
@@ -58,6 +61,7 @@
           :class="{ 'review-active': index === activeIndex }"
           @click.stop="handleIndicatorClick(index)">
             <img :src="item.$slots.default[0].data.attrs.src" alt="" :style="{ float: 'left', width: imgWidth }">
+            <span class="describe" v-show="index === activeIndex">{{ item.$slots.default[0].data.attrs.des }}</span>
           </div>
         </div>
       </li>
@@ -111,7 +115,8 @@ export default {
       activeIndex: -1,
       containerWidth: 0,
       timer: null,
-      hover: false
+      hover: false,
+      isMouseDown: false
     };
   },
   computed: {
@@ -220,6 +225,19 @@ export default {
       if (this.trigger === 'hover' && index !== this.activeIndex) {
         this.activeIndex = index;
       }
+    },
+    handleMouseDown() {
+      this.isMouseDown = true;
+      console.log(1);
+    },
+    handleMouseMove() {
+      if(this.isMouseDown) {
+        console.log(2);
+      }
+    },
+    handleMouseUp() {
+      this.isMouseDown = false;
+      console.log(3);
     }
   },
   created() {
@@ -257,9 +275,10 @@ export default {
   .el-carousel-review > li{
     display: inline-block;
     cursor: pointer;
+    user-select: none;
   }
   .el-carousel-review-container {
-    
+    position: relative;
   }
   .el-carousel-review-container .el-carousel-review-border {
     padding: 2px;
@@ -271,20 +290,13 @@ export default {
     border: 2px solid #FF4949 !important;
     transition: all 500ms;
   }
-
-  .el-carousel-review::-webkit-scrollbar {
-    background: transparent;
-    width: 12px;
-  }
-  .el-carousel-review:hover::-webkit-scrollbar {
-      background: #D3DCE6;
-  }
-  .el-carousel-review:hover::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-      border-radius: 10px;
-  }
-  .el-carousel-review:hover::-webkit-scrollbar-thumb {
-      border-radius: 10px;
-      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+  .describe {
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.6);
+    width: 100%;
+    padding: 2px 0 2px 0;
   }
 </style>
