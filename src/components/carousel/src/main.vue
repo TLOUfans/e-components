@@ -47,15 +47,15 @@
       </ul>
     </div>
     <ul 
-      class="el-carousel-review" v-if="review" 
+      class="npms-carousel-review" v-if="review" 
       @mouseenter.stop="handleMouseEnter"
       @mouseleave.stop="handleMouseLeave"
       :style="{ width: $props.width }">
       <li v-for="(item, index) in $children">
-        <div class="el-carousel-review-container">
+        <div class="npms-carousel-review-container">
           <div 
-          class="el-carousel-review-border" 
-          :class="{ 'review-active': index === activeIndex }"
+          class="npms-carousel-review-border" 
+          :class="{ 'npms-review-active': index === activeIndex }"
           @click.stop="handleIndicatorClick(index, $parent)">
             <img :src="item.$slots.default[0].data.attrs.src" alt="" :style="{ float: 'left', width: imgWidth }">
             <span class="describe" v-show="index === activeIndex">{{ item.$slots.default[0].data.attrs.des }}</span>
@@ -173,6 +173,9 @@ export default {
       });
     },
     playSlides() {
+      document.querySelectorAll('.npms-carousel-review li').forEach(v => {
+        v.style.left = -this.arr[this.activeIndex + 1] + 'px';
+      })
       if (this.activeIndex < this.items.length - 1) {
         this.activeIndex++;
       } else {
@@ -216,11 +219,9 @@ export default {
     },
     handleIndicatorClick(index, parent) {
       this.activeIndex = index;
-      if(parent) {
-        if((index + 1) * parseInt(this.imgWidth) > parseInt(parent.width) / 2) {
-          console.log('移动');
-        }
-      }
+      document.querySelectorAll('.npms-carousel-review li').forEach(v => {
+        v.style.left = -this.arr[index] + 'px';
+      })
     },
     handleIndicatorHover(index) {
       if (this.trigger === 'hover' && index !== this.activeIndex) {
@@ -244,6 +245,25 @@ export default {
         this.activeIndex = this.initialIndex;
       }
       this.startTimer();
+      let containerWidth = document.querySelector('.npms-carousel-review-container').offsetWidth;
+      let ulWidth = document.querySelector('.npms-carousel-review').offsetWidth;
+      let count = Math.ceil(ulWidth / 2 / containerWidth);
+      this.arr = [];
+      let limitWidth = 0;
+      if(parseInt(count * containerWidth - ulWidth / 2) >= 0) {
+        limitWidth = containerWidth / 2 + parseInt(count * containerWidth - ulWidth / 2);
+      } else {
+        limitWidth = Math.abs(parseInt(count * containerWidth - ulWidth / 2));
+      }
+      for(var i = 0; i < this.items.length; i++) {
+        if(i < count) {
+          this.arr.push(0);
+        } else if(i >= count && i < this.items.length - count) {
+          this.arr.push(limitWidth + (i - count) * containerWidth);
+        } else if(i >= this.items.length - count) {
+          this.arr.push(containerWidth * this.items.length - ulWidth);
+        }
+      }
     });
   },
   beforeDestroy() {
@@ -253,29 +273,31 @@ export default {
 </script>
 
 <style scoped>
-  .el-carousel-review {
+  .npms-carousel-review {
     list-style: none;
     margin: 3px 0 0 0;
     padding: 0;
     overflow-x: hidden;
     white-space:nowrap;
   }
-  .el-carousel-review > li{
+  .npms-carousel-review > li{
     display: inline-block;
     cursor: pointer;
     user-select: none;
     position: relative;
+    transition: left 300ms;
+    left: 0;
   }
-  .el-carousel-review-container {
+  .npms-carousel-review-container {
     position: relative;
   }
-  .el-carousel-review-container .el-carousel-review-border {
+  .npms-carousel-review-container .npms-carousel-review-border {
     padding: 2px;
     border: 2px solid #fff;
     overflow: hidden;
     transition: all 500ms;
   }
-  .review-active {
+  .npms-review-active {
     border: 2px solid #FF4949 !important;
     transition: all 500ms;
   }
